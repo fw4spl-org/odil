@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developer documentation &mdash; Odil 0.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Odil 0.4.0 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to Odil’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="developer-documentation">
+<h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Odil&#8217;s developer documentation, feel free to comment and suggest enhancements. Should you need any definition, you can find them <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_4.html">here</a>.</p>
+<p>This documentation will cover the following concepts:</p>
+<ol class="arabic simple">
+<li>How to use, access and browse the dictionary</li>
+<li>Error management: exceptions</li>
+<li>Types Odil uses for tags and data in general</li>
+<li>How to read/write a file</li>
+<li>Transmit data through the network</li>
+<li>Different DICOM protocols&#8217; implementations</li>
+</ol>
+<div class="section" id="the-dictionary">
+<h2>The dictionary<a class="headerlink" href="#the-dictionary" title="Permalink to this headline">¶</a></h2>
+<p>Odil uses a dictionary to make an associations and store elements. This dictionary is actually a map which contains <code class="docutils literal"><span class="pre">ElementsDictionary</span></code>. Those <code class="docutils literal"><span class="pre">ElementsDictionary</span></code> are a bound type <code class="docutils literal"><span class="pre">std::map&lt;ElementsDictionaryKey,</span> <span class="pre">ElementsDictionaryEntry&gt;</span></code>. From the dictionary we can get any element&#8217;s <code class="docutils literal"><span class="pre">Name</span></code>, <code class="docutils literal"><span class="pre">Tag</span></code>, <code class="docutils literal"><span class="pre">Key</span></code>, <code class="docutils literal"><span class="pre">VR</span></code> (Value Representation) or <code class="docutils literal"><span class="pre">VM</span></code> (Value Multiplicity).</p>
+<p><code class="docutils literal"><span class="pre">ElementsDictionaryKey</span></code> is a class that has 3 types defined in the enum <code class="docutils literal"><span class="pre">Type</span></code> inside itself. It can be built from a tag, a string or without any argument, which results in the creation of an <code class="docutils literal"><span class="pre">ElementsDictionaryKey</span></code> of type &#8220;none&#8221;.
+As stated in the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_3.html">DICOM Documentation</a> , a Tag is :</p>
+<blockquote>
+<div>A unique identifier for an element of information composed of an ordered pair of numbers (a Group Number followed by an Element Number), which is used to identify Attributes and corresponding Data Elements.</div></blockquote>
+<p><code class="docutils literal"><span class="pre">ElementsDictionaryEntry</span></code> is a struct containing 4 strings: name, keyword, vr (type) and vm (multiplicity) which can all be set into the constructor, and will be assigned to an empty string if they have not been.</p>
+</div>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Odil relies on exceptions for error handling.</p>
+<p>The class <code class="docutils literal"><span class="pre">odil::Exception</span></code> inherits from <code class="docutils literal"><span class="pre">std::exception</span></code>, and only contains the message passed to the constructor, which is returned whenever the exception is raised.</p>
+<p>The <code class="docutils literal"><span class="pre">Exception</span></code> class is inherited by several classes, such as <code class="docutils literal"><span class="pre">AssociationAborted</span></code>, <code class="docutils literal"><span class="pre">AssociationRejected</span></code> and <code class="docutils literal"><span class="pre">AssociationReleased</span></code>, which are all related to association negociation.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">AssociationAborted</span></code>: contains a source of the error and a reason, with the message set as &#8220;Association aborted&#8221;.</li>
+<li><code class="docutils literal"><span class="pre">AssociationRejected</span></code>: is a struct which message is set by default to &#8220;Association rejected&#8221; but can be changed in the constructor, it also contains three private unsigned chars :  <code class="docutils literal"><span class="pre">_result</span></code>, <code class="docutils literal"><span class="pre">_source</span></code> and <code class="docutils literal"><span class="pre">_reason</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">AssociationReleased</span></code>: is just an <code class="docutils literal"><span class="pre">Exception</span></code> with its message set as &#8220;Association released&#8221;.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="data-types">
+<h2>Data types<a class="headerlink" href="#data-types" title="Permalink to this headline">¶</a></h2>
+<p>Instead of the 31 data types DICOM offers, Odil simplifies it by reducing this number to 5:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Integer (<code class="docutils literal"><span class="pre">int64_t</span></code>)</li>
+<li>Real (<code class="docutils literal"><span class="pre">double</span></code>)</li>
+<li>String</li>
+<li>Binary</li>
+<li>DataSets</li>
+</ul>
+</div></blockquote>
+<p>You can find them in the classe Value, which contains the enum containing all Type values and methods to access them. NB:  All of them are arrays, even if it is empty or contains only one element! Also, everything is explicitly typed.</p>
+</div>
+<div class="section" id="read-write-data">
+<h2>Read/write data<a class="headerlink" href="#read-write-data" title="Permalink to this headline">¶</a></h2>
+<p>To read and write data, Odil relies mainly on two classes: <code class="docutils literal"><span class="pre">Reader</span></code> and <code class="docutils literal"><span class="pre">Writer</span></code>.</p>
+<div class="section" id="the-reader-class">
+<h3>The Reader class<a class="headerlink" href="#the-reader-class" title="Permalink to this headline">¶</a></h3>
+<p>This class can read <code class="docutils literal"><span class="pre">Tag</span></code> s, <code class="docutils literal"><span class="pre">DataSet</span></code> s, <code class="docutils literal"><span class="pre">Element</span></code> s or files.</p>
+<p>To do so, it uses a private <code class="docutils literal"><span class="pre">Visitor</span></code> that allows to visit the target data. It is instanciated in function of the type of data we want to read, when it is needed.</p>
+<img src="_images/graphviz-a2698830d965890acbe5b24f6aedf332336835dd.png" alt="digraph {
+  st -&gt; op -&gt; op2 -&gt; op3 -&gt; e
+
+  st [label=&quot;Reading Data&quot;,shape=box,style=rounded]
+  op [label=&quot;Call corresponding method&quot;,shape=box]
+  op2 [label=&quot;Instanciate Visitor (done by method)&quot;,shape=box]
+  op3 [label=&quot;Apply Visitor to Data&quot;,shape=box]
+  e [label=&quot;Return read Data&quot;,shape=box,style=rounded]
+}" />
+</div>
+<div class="section" id="the-writer-class">
+<h3>The Writer class<a class="headerlink" href="#the-writer-class" title="Permalink to this headline">¶</a></h3>
+<p>Using this class, Odil allows you to write the same type of Data the <code class="docutils literal"><span class="pre">Reader</span></code> Class allows you to read (<code class="docutils literal"><span class="pre">DataSet</span></code> s, <code class="docutils literal"><span class="pre">Tag</span></code> s, <code class="docutils literal"><span class="pre">Element</span></code> s or Files).</p>
+<p>The writer class proposes two constructors:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">/// @brief Build a writer.</span>
+<span class="n">Writer</span><span class="p">(</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ostream</span> <span class="o">&amp;</span> <span class="n">stream</span><span class="p">,</span>
+    <span class="n">ByteOrdering</span> <span class="n">byte_ordering</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">explicit_vr</span><span class="p">,</span>
+    <span class="n">ItemEncoding</span> <span class="n">item_encoding</span><span class="o">=</span><span class="n">ItemEncoding</span><span class="o">::</span><span class="n">ExplicitLength</span><span class="p">,</span>
+    <span class="kt">bool</span> <span class="n">use_group_length</span><span class="o">=</span><span class="nb">false</span><span class="p">);</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @brief Build a writer, derive byte ordering and explicit-ness of VR</span>
+<span class="cm"> * from transfer syntax.</span>
+<span class="cm"> */</span>
+<span class="n">Writer</span><span class="p">(</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ostream</span> <span class="o">&amp;</span> <span class="n">stream</span><span class="p">,</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="k">const</span> <span class="o">&amp;</span> <span class="n">transfer_syntax</span><span class="p">,</span>
+    <span class="n">ItemEncoding</span> <span class="n">item_encoding</span><span class="o">=</span><span class="n">ItemEncoding</span><span class="o">::</span><span class="n">ExplicitLength</span><span class="p">,</span>
+    <span class="kt">bool</span> <span class="n">use_group_length</span><span class="o">=</span><span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The writer&#8217;s behaviour can be described by the following flowchart:</p>
+<img src="_images/graphviz-a4002d9e1688c1bb26245346df8e24a71b67b3b5.png" alt="digraph {
+  st [label=&quot;Select stream&quot;,shape=box,style=rounded]
+  e [label=&quot;Write into stream&quot;,shape=box]
+  op [label=&quot;Call corresponding method&quot;,shape=box]
+  op2 [label=&quot;Instanciate Visitor (done by method)&quot;,shape=box]
+  op3 [label=&quot;Apply Visitor to Data&quot;,shape=box,style=rounded]
+
+  st -&gt; op -&gt; op2 -&gt; op3 -&gt; e
+}" />
+</div>
+<div class="section" id="reading-writing-into-a-file">
+<h3>Reading/Writing into a file<a class="headerlink" href="#reading-writing-into-a-file" title="Permalink to this headline">¶</a></h3>
+<p>To read/write into a file, you can use the static methods <code class="docutils literal"><span class="pre">odil::Reader::read_file(std::istream</span> <span class="pre">&amp;,</span> <span class="pre">bool)</span></code> and <code class="docutils literal"><span class="pre">odil::Writer::write_file(DataSet</span> <span class="pre">const</span> <span class="pre">&amp;,</span> <span class="pre">std::ostream</span> <span class="pre">&amp;)</span></code></p>
+<p>You can find an example of how to proceed with DICOM directory creation in <a class="reference external" href="https://github.com/lamyj/odil/blob/master/tests/code/BasicDirectoryCreator.cpp#L50">Odil&#8217;s tests code</a>.</p>
+</div>
+</div>
+<div class="section" id="data-transmission">
+<h2>Data transmission<a class="headerlink" href="#data-transmission" title="Permalink to this headline">¶</a></h2>
+<p>As far as data transmission is concerned, Odil does not handle TCP/IP requests, but instead it manages connexion between remote devices through association negociation. An association is a network data exchange between a Service Class Provider or <em>SCP</em> and a Service Class User or <em>SCU</em>.</p>
+<img src="_images/graphviz-4c12fba46022c51d1ea33ffd1f7a8c9b55d8191e.png" alt="digraph {
+  st [label=&quot;TCP/IP networking&quot;,shape=box,style=rounded]
+  e [label=&quot;DICOM Software Application&quot;,shape=box]
+  op [label=&quot;Low-level DICOM :association negociation and PDU. Aka DICOM Upper Layer Protocol&quot;,shape=box]
+  op2 [label=&quot;High-level DICOM DIMSE and SOP&quot;,shape=box,style=rounded]
+
+  st -&gt; op -&gt; op2 -&gt; e
+}" />
+<p>As you know, DICOM entities are identified by application and not by devices, so there is a need to give every application it&#8217;s own label to differenciate every single one of them. DICOM sets this parameter as the <em>Application Entity Title</em>.</p>
+<p>Odil manages that in the <code class="docutils literal"><span class="pre">AssociationParameters</span></code>.  It is necessary to set a called AETitle and a calling AETitle. Here&#8217;s an example of association parameter settings you can find in Odil&#8217;s examples:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">association</span><span class="p">.</span><span class="n">update_parameters</span><span class="p">()</span>
+  <span class="p">.</span><span class="n">set_calling_ae_title</span><span class="p">(</span><span class="s">&quot;myself&quot;</span><span class="p">)</span>
+  <span class="p">.</span><span class="n">set_called_ae_title</span><span class="p">(</span><span class="s">&quot;REMOTE&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The methods <code class="docutils literal"><span class="pre">set_calling_ae_title</span></code> and <code class="docutils literal"><span class="pre">set_called_ae_title</span></code> return the <code class="docutils literal"><span class="pre">AssociationParameters</span></code> after setting their respective attribute to the value you passed as argument to allow method chaining.</p>
+<p>You can also create an association through the copy constructor, which will return an unassociated association with the same parameters as the old one you used to create your new association. You will then have to try to associate it via the <code class="docutils literal"><span class="pre">odil::Association::associate()</span></code> method.</p>
+<p>To establish an association, you don&#8217;t only need to set AE&#8217;s identities, but you need to set the presentation contexts they are going to use to communicate. A presentation context (or PC)  lays down ground rules on the data transmission that will occur between the client (usually the calling AE) and the server (usually the called AE). This is how the communicating apps are going to negociate what parts of the standard they are going to share, and what they are going to communicate on. The information will be cut down between an essential (DICOM abstract syntax) and a negociable part (DICOM Transfer syntax).  DICOM offers many Abstract Syntax UIDs, which Odil implements in the <code class="docutils literal"><span class="pre">odil::registry</span></code> namespace.</p>
+<p>So the first step of data transmission is the Association establishment, which goes this way:</p>
+<div class="section" id="association-establishment">
+<h3>Association Establishment<a class="headerlink" href="#association-establishment" title="Permalink to this headline">¶</a></h3>
+<object data="_static/association_establishment.svg" type="image/svg+xml"></object><p>According to <a class="reference external" href="http://dicomiseasy.blogspot.fr/2011/12/introduction-to-dicom-chapter-5-solving.html">DICOM is easy</a>, 99% of network problems you&#8217;ll encounter while working on DICOM networking, will occur during this A-ASSOCIATE-RQ step. If you want more information on DICOM&#8217;s way to implement A-ASSOCIATE-RQ , you can browse <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part08/sect_9.3.2.html">DICOM standard</a>. Odil stores the result of the presentation context negotiation directly inside of the Presentation Context (<code class="docutils literal"><span class="pre">odil::AssociationParameters::PresentationContext</span></code>) , in this enum:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">enum</span> <span class="k">class</span> <span class="nc">Result</span>
+<span class="p">{</span>
+  <span class="n">Acceptance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">UserRejection</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="n">NoReason</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="n">AbstractSyntaxNotSupported</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+  <span class="n">TransferSyntaxesNotSupported</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dicom-pdu-protocol-data-units">
+<h2>DICOM PDU (Protocol Data Units)<a class="headerlink" href="#dicom-pdu-protocol-data-units" title="Permalink to this headline">¶</a></h2>
+<p>This diagram shows the main steps of DICOM communication between two Application Entities.</p>
+<object data="_static/communication.svg" type="image/svg+xml"></object><p>On this Diagram(above), dashed lines show failures in the process, for which Odil will throw an error. For each of those steps, the AEs will be in a different state. Should you need it, you can find more information about those states <a class="reference external" href="http://dicom.nema.org/dicom/2013/output/chtml/part08/sect_9.2.html">here</a>.</p>
+<p>Here is Odil&#8217;s implementation of them in <code class="docutils literal"><span class="pre">odil::dul::StateMachine::State</span></code>:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">enum</span> <span class="k">class</span> <span class="nc">State</span>
+<span class="p">{</span>
+  <span class="n">Sta1</span><span class="p">,</span>
+  <span class="n">Sta2</span><span class="p">,</span> <span class="n">Sta3</span><span class="p">,</span> <span class="n">Sta4</span><span class="p">,</span> <span class="n">Sta5</span><span class="p">,</span>
+  <span class="n">Sta6</span><span class="p">,</span>
+  <span class="n">Sta7</span><span class="p">,</span> <span class="n">Sta8</span><span class="p">,</span> <span class="n">Sta9</span><span class="p">,</span> <span class="n">Sta10</span><span class="p">,</span> <span class="n">Sta11</span><span class="p">,</span> <span class="n">Sta12</span><span class="p">,</span>
+  <span class="n">Sta13</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="protocols">
+<h2>Protocols<a class="headerlink" href="#protocols" title="Permalink to this headline">¶</a></h2>
+<p>Most of DICOM communication is made through messages, which Odil implements in the <code class="docutils literal"><span class="pre">odil::message</span></code> namespace.
+As you can see in the diagrams contained in this documentation, most messages can be split into two categories: requests and responses hence Odil chose to implement messages through inheritance of a <code class="docutils literal"><span class="pre">Request</span></code> or a <code class="docutils literal"><span class="pre">Response</span></code> base class.</p>
+<img alt="_images/message_inheritance.png" src="_images/message_inheritance.png" />
+<p>In the same way, odil implements SCUs and SCPs for every type of protocol below. Each and everyone of them inherits the base class SCU or SCP.</p>
+<div class="section" id="echo">
+<h3>Echo<a class="headerlink" href="#echo" title="Permalink to this headline">¶</a></h3>
+<p>C-Echo has been nicknamed “DICOM ping&#8221;, because using a TCP ping only gives us informations about the TCP connection between two devices, but does not tell us if the distant machine is running any DICOM software at all. C-Echo uses DICOM procedures, and then gives us the information</p>
+<object data="_static/echo.svg" type="image/svg+xml"></object></div>
+<div class="section" id="store">
+<h3>Store<a class="headerlink" href="#store" title="Permalink to this headline">¶</a></h3>
+<p>DIMSE services dealing with composite data are called &#8220;DIMSE-C&#8221; services; and DIMSE services dealing with normalized data are called &#8220;DIMSE-N&#8221; services. The &#8220;C&#8221; and &#8220;N&#8221; are often prefixed to the service name; for ex­ample, the C-Store service stores DICOM images (composite objects). Similarly, DIMSE messages with service requests are labeled with an &#8220;Rq&#8221; suffix (e.g., C-Store-Rq is what a CT scanner sends to a digital archive, requesting image storage). DIMSE messages with service responses are labeled with an &#8220;Rsp&#8221; suffix (e.g., C-Store-Rsp is used by an archive to reply to the scanner).</p>
+<p>In Odil, you need to instanciate the Store SCU by providing an association between the AEs and SCP by providing an association, and eventually a callback, which will be used to treat the requests it will receive and then send a C-Store-Response under the form of a <code class="docutils literal"><span class="pre">odil::message::CStoreResponse</span></code>.</p>
+</div>
+<div class="section" id="find">
+<h3>Find<a class="headerlink" href="#find" title="Permalink to this headline">¶</a></h3>
+<p>In a way, C-Find is  similar to C-Echo, with the SCU (or calling AE) sending a request to the SCP(or called AE), which treats it before sending a response.</p>
+<p>Odil allows you to instanciate a FindSCP or FindSCU to handle C-Find based operations. Both can be instanciated from the association linking the calling AE and the called AE and an optional parameter. The optional parameter for the FindSCU is the callback which will be used by  the FindSCU object throught the method <code class="docutils literal"><span class="pre">odil::FindSCU::find(Dataset</span> <span class="pre">const</span> <span class="pre">&amp;,</span> <span class="pre">Callback)</span></code>.</p>
+<p>You can find an example of how to use a FindSCU <a class="reference external" href="https://github.com/lamyj/odil/blob/master/examples/find.cpp">in odil&#8217;s find example</a>.</p>
+</div>
+<div class="section" id="get">
+<h3>Get<a class="headerlink" href="#get" title="Permalink to this headline">¶</a></h3>
+<p>C-GET Protocol allows you to fetch and select</p>
+<object data="_static/get.svg" type="image/svg+xml"></object></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developer documentation</a><ul>
+<li><a class="reference internal" href="#the-dictionary">The dictionary</a></li>
+<li><a class="reference internal" href="#exceptions">Exceptions</a></li>
+<li><a class="reference internal" href="#data-types">Data types</a></li>
+<li><a class="reference internal" href="#read-write-data">Read/write data</a><ul>
+<li><a class="reference internal" href="#the-reader-class">The Reader class</a></li>
+<li><a class="reference internal" href="#the-writer-class">The Writer class</a></li>
+<li><a class="reference internal" href="#reading-writing-into-a-file">Reading/Writing into a file</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-transmission">Data transmission</a><ul>
+<li><a class="reference internal" href="#association-establishment">Association Establishment</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dicom-pdu-protocol-data-units">DICOM PDU (Protocol Data Units)</a></li>
+<li><a class="reference internal" href="#protocols">Protocols</a><ul>
+<li><a class="reference internal" href="#echo">Echo</a></li>
+<li><a class="reference internal" href="#store">Store</a></li>
+<li><a class="reference internal" href="#find">Find</a></li>
+<li><a class="reference internal" href="#get">Get</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Odil&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Julien Lamy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
