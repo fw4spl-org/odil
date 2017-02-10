@@ -25,8 +25,8 @@ class ODIL_API NSetResponse: public Response
 {
 public:
     /**
-     * @brief Create an NSet response with given Message ID and
-     * affected SOP class UID.
+     * @brief Create an NSet response with given Message ID, status,
+     * affected SOP class UID and affected  SOP instance UID
      */
     NSetResponse(
             Value::Integer const & message_id_being_responded_to,
@@ -45,9 +45,8 @@ public:
     /// @brief Destructor.
     virtual ~NSetResponse();
     
-    ODIL_MESSAGE_MANDATORY_FIELD_INTEGER_MACRO( status, registry::Status )
-
     ODIL_MESSAGE_OPTIONAL_FIELD_STRING_MACRO(affected_sop_class_uid, registry::AffectedSOPClassUID)
+    ODIL_MESSAGE_OPTIONAL_FIELD_STRING_MACRO(affected_sop_instance_uid, registry::AffectedSOPInstanceUID)
 
 };
 
