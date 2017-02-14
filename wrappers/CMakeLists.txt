@@ -1,7 +1,23 @@
-find_package(Boost REQUIRED COMPONENTS python)
+
+if(BUILD_PYTHON3)
+  set(Python_ADDITIONAL_VERSIONS 3)
+  find_package(Boost REQUIRED COMPONENTS python-py3)
+  find_package(PythonInterp 3 REQUIRED)
+  find_package(PythonLibs 3 REQUIRED)
+elseif(BUILD_PYTHON35)
+  set(Python_ADDITIONAL_VERSIONS 3.5)
+  find_package(Boost REQUIRED COMPONENTS python-py35)
+  find_package(PythonInterp 3.5 REQUIRED)
+  find_package(PythonLibs 3.5 REQUIRED)
+else()
+  find_package(Boost REQUIRED COMPONENTS python)
+  find_package(PythonInterp 2.7 REQUIRED)
+  find_package(PythonLibs 2.7 REQUIRED)
+endif()
+
+
 find_package(JsonCpp REQUIRED)
-find_package(PythonInterp 2.7 REQUIRED)
-find_package(PythonLibs 2.7 REQUIRED)
+
 
 if(NOT "${PYTHONLIBS_VERSION_STRING}" STREQUAL "${PYTHON_VERSION_STRING}")
     message(
