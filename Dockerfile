@@ -14,8 +14,9 @@ RUN apt-get update && apt-get install git g++ pkg-config libicu-dev libdcmtk-dev
 COPY . /home/odil/src 
 RUN mkdir /home/odil/build && \
     cd /home/odil/build && \
-    cmake ../src -DBUILD_PYTHON35=ON -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF && \
+    cmake ../src -DBUILD_PYTHON35=ON -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release && \
     make . && \
     make install && \
-    ln -s /usr/local/lib/libodil.so.0 /usr/lib/libodil.so.0
+    ln -s /usr/local/lib/libodil.so.0 /usr/lib/libodil.so.0 &&\
+    ln -s /usr/local/lib/python3/dist-packages/odil.so /usr/local/lib/python3.5/dist-packages/odil.so
 
