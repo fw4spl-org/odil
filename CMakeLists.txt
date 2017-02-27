@@ -10,6 +10,8 @@ set(odil_VERSION
 option(BUILD_SHARED_LIBS "Build Odil with shared libraries." ON)
 option(BUILD_EXAMPLES "Build the examples directory." ON)
 option(BUILD_WRAPPERS "Build the Python Wrappers." ON)
+option(BUILD_PYTHON3 "Build Odil with Python3" OFF)
+option(BUILD_PYTHON35 "Build Odil with Python3.5." OFF)
 
 option(WITH_DCMTK "Build the DCMTK converter" ON)
 option(

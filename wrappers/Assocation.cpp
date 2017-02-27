@@ -53,6 +53,11 @@ void set_tcp_timeout(odil::Association& association, float seconds)
         boost::posix_time::microseconds(seconds*1000000.));
 }
 
+void close_association(odil::Association& a)
+{
+    a.get_transport().close();
+}
+
 }
 
 void wrap_Association()
@@ -112,6 +117,8 @@ void wrap_Association()
                               .def("next_message_id", &Association::next_message_id)
                               // Send message
                               .def("send_message", &Association::send_message)
+                              // Close association
+                              .def("close_association", &close_association)
     ;
 
     enum_<Association::Result>("Result")

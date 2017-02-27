@@ -38,31 +38,11 @@ NSetRequest
     this->set_data_set(dataset);
 }
 
-/*
-NSetRequest
-::NSetRequest(Value::Integer message_id,
-              Value::String const & requested_sop_class_uid,
-              Value::String const & requested_sop_instance_uid,
-              DataSet const & dataset
-              )
-    : Request(message_id)
-{
-    this->set_command_field( ::odil::message::Message::Command::N_SET_RQ);
-    this->set_requested_sop_class_uid(requested_sop_class_uid);
-    this->set_requested_sop_instance_uid(requested_sop_instance_uid);
-
-    if( dataset.empty() )
-    {
-        throw Exception("Data set is required");
-    }
-    this->set_data_set(dataset);
-}
-*/
-
 NSetRequest
 ::NSetRequest(Message const & message)
 : Request(message)
 {
+
     if(message.get_command_field() != Command::N_SET_RQ)
     {
         throw Exception("Message is not a N-SET-RQ");

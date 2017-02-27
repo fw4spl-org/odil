@@ -4,15 +4,19 @@ FROM ubuntu:16.10
 #   Install dependencies
 ###
 RUN apt-get update && apt-get install git g++ pkg-config libicu-dev libdcmtk-dev libboost-dev libboost-test-dev \
-    libboost-system-dev libboost-python-dev libboost-filesystem-dev python liblog4cpp5-dev libjsoncpp-dev cmake -y
+    libboost-system-dev python3 python3-dev libboost-python-dev libboost-filesystem-dev liblog4cpp5-dev libjsoncpp-dev cmake -y
+
 
 ###
 #   Get code source and build the lib
 ###
-RUN git clone https://github.com/lamyj/odil.git /home/odil/src && \
-    mkdir /home/odil/build && \
+
+COPY . /home/odil/src 
+RUN mkdir /home/odil/build && \
     cd /home/odil/build && \
-    cmake ../src && \
+    cmake ../src -DBUILD_PYTHON35=ON -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release && \
     make . && \
     make install && \
-    ln -s /usr/local/lib/libodil.so.0 /usr/lib/libodil.so.0
+    ln -s /usr/local/lib/libodil.so.0 /usr/lib/libodil.so.0 &&\
+    ln -s /usr/local/lib/python3/dist-packages/odil.so /usr/local/lib/python3.5/dist-packages/odil.so
+
