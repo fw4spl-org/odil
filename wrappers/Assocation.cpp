@@ -32,6 +32,11 @@ void receive_association(
     }
 }
 
+void close_transport(odil::Association& association)
+{
+    association.get_transport().close();
+}
+
 void released_translator(odil::AssociationReleased const& e)
 {
     PyErr_SetString(wrapped_AssociationReleased, e.what());
@@ -117,8 +122,8 @@ void wrap_Association()
                               .def("next_message_id", &Association::next_message_id)
                               // Send message
                               .def("send_message", &Association::send_message)
-                              // Close association
-                              .def("close_association", &close_association)
+                              .def("close_transport", &close_transport)
+                              .def("is_open", &Association::is_open)
     ;
 
     enum_<Association::Result>("Result")

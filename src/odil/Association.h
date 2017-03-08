@@ -143,7 +143,10 @@ public:
     /// @brief Test whether the object is currently associated to its peer.
     bool is_associated() const;
 
-    /// @brief Request an association with the peer.
+    /// @brief Test whether the association is in the state 6 to transfer data.
+    bool is_open() const;
+
+    /// @brief Request an association with the peer. Throws an exception if the endpoint can not be reached.
     void associate();
 
     /// @brief Receive an association from a peer.
