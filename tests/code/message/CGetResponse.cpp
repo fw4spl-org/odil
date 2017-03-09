@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE CGetResponse
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/message/CGetResponse.h"
 #include "odil/DataSet.h"

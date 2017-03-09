@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE CFindRequest
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/message/CFindRequest.h"
 #include "odil/DataSet.h"

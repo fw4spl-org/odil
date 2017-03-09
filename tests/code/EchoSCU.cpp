@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE EchoSCU
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/EchoSCU.h"
 #include "odil/registry.h"

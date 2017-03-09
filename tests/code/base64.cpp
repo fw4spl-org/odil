@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Base64
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <iterator>
 #include <string>

@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE pdu::PDataTF
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <sstream>
 #include <string>

@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Tag
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/Exception.h"
 #include "odil/Tag.h"

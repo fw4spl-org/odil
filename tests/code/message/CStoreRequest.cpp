@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE CStoreRequest
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/message/CStoreRequest.h"
 #include "odil/DataSet.h"

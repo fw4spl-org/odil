@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE AssociationParameters
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/AssociationParameters.h"
 #include "odil/Exception.h"

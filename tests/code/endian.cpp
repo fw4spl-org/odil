@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE endian
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <cstdint>
 #include "odil/endian.h"

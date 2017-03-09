@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE GetSCP
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <algorithm>
 #include <chrono>
