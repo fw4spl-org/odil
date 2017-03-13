@@ -32,6 +32,11 @@ void receive_association(
     }
 }
 
+void close_transport(odil::Association& association)
+{
+    association.get_transport().close();
+}
+
 void released_translator(odil::AssociationReleased const& e)
 {
     PyErr_SetString(wrapped_AssociationReleased, e.what());
@@ -51,6 +56,11 @@ void set_tcp_timeout(odil::Association& association, float seconds)
 {
     association.set_tcp_timeout(
         boost::posix_time::microseconds(seconds*1000000.));
+}
+
+void close_association(odil::Association& a)
+{
+    a.get_transport().close();
 }
 
 }
@@ -112,6 +122,8 @@ void wrap_Association()
                               .def("next_message_id", &Association::next_message_id)
                               // Send message
                               .def("send_message", &Association::send_message)
+                              .def("close_transport", &close_transport)
+                              .def("is_open", &Association::is_open)
     ;
 
     enum_<Association::Result>("Result")

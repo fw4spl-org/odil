@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE SCU
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/SCU.h"
 #include "odil/registry.h"

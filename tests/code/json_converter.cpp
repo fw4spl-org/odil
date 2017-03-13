@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE json_converter
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <set>
 #include <string>

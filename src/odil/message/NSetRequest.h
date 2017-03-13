@@ -32,8 +32,8 @@ public:
     NSetRequest(Message const & message);
 
     /**
-     * @brief Create an NSet request with given Message ID and
-     * requested SOP class UID and SOP Instance UID.
+     * @brief Create an NSet request with given Message ID,
+     * requested SOP class UID, requested SOP Instance UID and a dataset
      */
     NSetRequest(
             Value::Integer message_id,

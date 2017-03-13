@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE GetSCU
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "odil/DataSet.h"
 #include "odil/GetSCU.h"

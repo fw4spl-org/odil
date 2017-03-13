@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE pdu::AAbort
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <istream>
 #include <memory>

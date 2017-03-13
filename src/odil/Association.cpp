@@ -198,6 +198,13 @@ Association
     return this->_state_machine.get_transport().is_open();
 }
 
+bool
+Association
+::is_open() const
+{
+    return this->_state_machine.get_state() == odil::dul::StateMachine::State::Sta6 ;
+}
+
 void
 Association
 ::associate()
