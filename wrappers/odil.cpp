@@ -57,6 +57,7 @@ void wrap_CMoveResponse();
 void wrap_CStoreRequest();
 void wrap_CStoreResponse();
 void wrap_NSetRequest();
+void wrap_NCreateRequest();
 
 BOOST_PYTHON_MODULE(odil)
 {
@@ -109,4 +110,5 @@ BOOST_PYTHON_MODULE(odil)
     wrap_CStoreRequest();
     wrap_CStoreResponse();
     wrap_NSetRequest();
+    wrap_NCreateRequest();
 }
