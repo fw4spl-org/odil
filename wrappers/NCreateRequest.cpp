@@ -51,7 +51,7 @@ void wrap_NCreateRequest()
             &NCreateRequest::get_attribute_list,
             return_value_policy<copy_const_reference>())
         .def(
-            "set_command_field",
+            "set_attribute_field",
             &NCreateRequest::set_attribute_list)
 
     ;
